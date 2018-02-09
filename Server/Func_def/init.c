@@ -20,5 +20,7 @@ void init(void)
     exit(EXIT_FAILURE);
   }
   mysql_set_character_set(&mysql,"utf8");
+  //create passwd table
+  if(mysql_query(&mysql,"create table passwd(id int(8) not null primary key auto_increment,account varchar(20) not null,nickname varchar(20) not null)"))
   return;
 }

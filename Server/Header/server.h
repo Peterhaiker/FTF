@@ -16,6 +16,8 @@
 #define SQL_PASS "2391457146"
 #define SQL_DB   "FTF"
 
+#include<mysql.h>
+#include<syslog.h>
 extern MYSQL mysql;//mysql对象
 
 #endif /* !SERVER_H */
