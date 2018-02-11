@@ -10,6 +10,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<fcntl.h>
+#include<mysql.h>
 #include"../Header/server.h"
 
 void init(void)
@@ -39,21 +40,27 @@ void init(void)
     exit(EXIT_FAILURE);
   }
   mysql_set_character_set(&mysql,"utf8");
+  //start transaction
+  if(mysql_query(&mysql,"set autocommit=0;start transaction")){
+    syslog(LOG_EMEGE,"init start transaction failed:%m");
+    exit(EXIT_FAILURE);
+  }
   //create passwd table
-  if(mysql_query(&mysql,"create table passwd(account mediumint not null primary key,nickname varchar(20),password varchar(50) not null)")){
-    //create failed
-    syslog(LOG_EMEGE,"create table passwd failed:%m");
+  while(mysql_next_result(&mysql))
+    mysql_store_result(&mysql);
+  if(!mysql_query(&mysql,"create table passwd(account mediumint not null primary key,nickname varchar(20),password varchar(50) not null)")){
+    //create profile table
+    if(!mysql_query(&mysql,"create table profile(account mediumint not null,name varchar(20) default null,sex varchar(1),fri_nums tinyint,grp_nums tinyint,ip_addr int not null,ip_port smallint not null,primary key(account),key pro_ip_addr_ind(ip_addr),key pro_id_port_ind(ip_port),constraint fk_account foreign key(account) references passwd(account))")){
+      //create friends table
+      if(!mysql_query(&mysql,"create table friends(account mediumint not null,ip_addr int not null,ip_port smallint not null,primary key(account),key fri_ip_addr_fk(ip_addr),key fri_ip_port_fk(ip_port),constraint fk_fri_account foreign key(account) references passwd(account),constraint fri_ip_addr_fk foreign key(ip_addr) references profile(ip_addr),constraint fri_ip_port_fk foreign key(ip_port) references profile(ip_port))")){
+        goto success;
+      }
+    }
+  }
+  if(mysql_query(&mysql,"rollback")){
+    syslog(LOG_EMEGE,"rollback transaction failed:%m");
     exit(EXIT_FAILURE);
   }
-  //create profile table
-  if(mysql_query(&mysql,"create table profile(account mediumint not null,name varchar(20) default null,sex varchar(1),fri_nums tinyint,grp_nums tinyint,ip_addr int not null,ip_port smallint not null,primary key(account),key pro_ip_addr_ind(ip_addr),key pro_id_port_ind(ip_port),constraint fk_account foreign key(account) references passwd(account))")){
-    syslog(LOG_EMEGE,"create table passwd failed:%m");
-    exit(EXIT_FAILURE);
-  }
-  //create friends table
-  if(mysql_query(&mysql,"create table friends(account mediumint not null,ip_addr int not null,ip_port smallint not null,primary key(account),key fri_ip_addr_fk(ip_addr),key fri_ip_port_fk(ip_port),constraint fk_fri_account foreign key(account) references passwd(account),constraint fri_ip_addr_fk foreign key(ip_addr) references profile(ip_addr),constraint fri_ip_port_fk foreign key(ip_port) references profile(ip_port))")){
-    syslog(LOG_EMEGE,"create table friends failed:%m");
-    exit(EXIT_FAILURE);
-  }
+success:syslog(LOG_INFO,"init successed");
   return;
 }
