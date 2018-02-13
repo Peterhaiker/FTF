@@ -19,7 +19,7 @@ int login(int connfd)
   char password[20]={'\0'};
   char nickname[20]={'\0'};
   char echotext[100]={'\0'};
-  for(int i=0;i<3;i++){
+  while(1){
     if(1==read(connfd,account,sizeof(int))){
       if(read(connfd,password,20)>0){
         if(!mysql_query(&mysql,"select nickname from passwd where account=%d,passwd=SHA2('%s',256)")){
@@ -30,12 +30,11 @@ int login(int connfd)
             return 1;
           }
           else{
-            strncpy(echotext,"输入错误，请重新输入:_\b",100);
-            write(connfd,"输入错误，请重新输入:_\b",sizeof(EOF));
+            write(connfd,"-1",sizeof(char)*3);
+            return 0;
           }
         }
       }
     }
   }
-  return 0;
 }

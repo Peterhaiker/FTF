@@ -15,9 +15,13 @@
 #define SQL_USER "root"
 #define SQL_PASS "2391457146"
 #define SQL_DB   "FTF"
+#define MAX_LIS  1024
 
 #include<mysql.h>
 #include<syslog.h>
 extern MYSQL mysql;//mysql对象
 
+void daemon(void);
+void init(void);
+int login(int connfd);
 #endif /* !SERVER_H */
