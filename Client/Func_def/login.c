@@ -33,13 +33,29 @@ int login(int connfd)
 
 void sign_in(int connfd)
 {
-  printf("                        账户名:");
+  printf("                        账户名(按q退出):");
   int account;
   char password[20]={'\0'};
   char login_state[20]={'\0'};
   while(1){
-    while(1!=scanf("%d",&account))
-      printf("              账户名输入不合法，请重新输入:_\b");
+    if(1!=scanf("%d",&account)){
+      printf("              账户名不合法，请重新输入(按q退出):_\b");
+      continue;
+    }
+    else{
+      if('q'==account){
+        return;
+      }
+      else{
+        if(100000>account){
+          printf("                   账户名不合法，请重新输入(按q退出):_\b");
+          continue;
+        }
+        else
+          break;
+      }
+    }
+    //账户输入成功，开始输入密码
     printf("                        密码:");
     while(1){
       fgets(password,20,stdin);
@@ -56,10 +72,13 @@ void sign_in(int connfd)
     read(connfd,login_state,sizeof(char)*20);
     if(0==strcmp("-1",login_state)){
       printf("                   账户或密码输入出错\n");
+      printf("                           账户:");
+      continue;
     }
     else{
-      printf("           %s 欢迎您\n");
+      printf("           %s 欢迎您\n",login_state);
       break;
     }
   }
+  return;
 }

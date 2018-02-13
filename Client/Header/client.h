@@ -16,6 +16,8 @@
 #define SQL_PASS "2391457146"
 #define SQL_DB   "FTF"
 #define MAX_LIS  1024
+#define DOUBLE_FORMAT "============================================================"
+#define SINGLE_FORMAT "------------------------------------------------------------"
 
 #include<mysql.h>
 #include<syslog.h>
