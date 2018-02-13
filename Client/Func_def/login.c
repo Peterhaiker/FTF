@@ -11,6 +11,7 @@
 
 void sign_in(int connfd);
 void sign_up(int connfd);
+int choice;
 
 int login(int connfd)
 {
@@ -33,6 +34,8 @@ int login(int connfd)
 
 void sign_in(int connfd)
 {
+  choice=1;
+  write(connfd,&choice,sizeof(int));
   printf("                        账户名(按q退出):");
   int account;
   char password[20]={'\0'};
@@ -81,4 +84,9 @@ void sign_in(int connfd)
     }
   }
   return;
+}
+
+void sign_up(int connfd)
+{
+
 }
